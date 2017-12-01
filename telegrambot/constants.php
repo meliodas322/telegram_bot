@@ -1,0 +1,30 @@
+<?php
+define('NEWLINE','
+');
+define('NO_STATUS', -1);
+define('MENU', 0);
+define('JOINING', 1);
+define('SELECTING_TYPE', 2);
+define('ENTERING_TITLE', 3);
+define('ENTERING_HASHTAG', 4);
+define('ENTERING_MAX', 5);
+define('ENTERING_SHARE', 6);
+define('ENTERING_DESCRIPTION', 7);
+define('ENTERING_DATE', 8);
+define('GIVEAWAY_SUMMARY', 9);
+define('GIVEAWAY_EDIT_TITLE', 10);
+define('GIVEAWAY_EDIT_HASHTAG', 11);
+define('GIVEAWAY_EDIT_MAX', 12);
+define('GIVEAWAY_EDIT_DESCRIPTION', 13);
+define('GIVEAWAY_EDIT_DATE', 14);
+define('SHOW_GIVEAWAY_DETAILS', 26);
+define('JOIN_HASHTAG_PROMPT', 27);
+define('JOINED', 28);
+define('GV_NOT_VALID', 29);
+define('SHOW_ALL', 30);
+define('LANGUAGE', 31);
+define('GIVEAWAY_CANCEL_PROMPT', 32);
+define('SHOW_GIVEAWAY_LIST', 34);
+define('SHOW_PRIZES', 35);
+define('OBJECT_PER_LIST', 3);
+define('CURRENCY', '€$₽');
