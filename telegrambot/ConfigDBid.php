@@ -1,8 +1,8 @@
 <?php
 return [
     'host'=>'localhost',
-    'db_name' =>'telegramid',
-    'username'=>'root',
-    'password'=>'',
-    'charset'=>'utf8'
+    'db_name' =>'имя базы',
+    'username'=>'имя юзера',
+    'password'=>'пароль',
+    'charset'=>'кодировка'
 ];
