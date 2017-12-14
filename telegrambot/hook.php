@@ -54,18 +54,28 @@ switch ($dbid->getState($user_id)[0]["state"]) { // в переменной $mes
                         $image3=$photo;
                         $image=$photo[count($photo) - 1];
                         $a=$botApi->getFileUrl();
-                        $file = $image3[0]['file_path'];
+                        $file = $image3[0]['file_id'];
+                        $fileName = $image3[0]['file_name'];
                         $b = '/';
                         $b1 = '/photos/';
                         $a1 = $a.$b.$file;
                         $a2 = $a.$b1;
                         $url = $a1;
-                        $bot->sendMessage($user_id, "url ".$url);
-                        $tmp = tempnam(sys_get_temp_dir(), 'img');
-                        
-                        /*$qrcode = new QrReader($a1);
-                        $text = $qrcode->text();         рабочая обработка qr-кода
-                        $bot->sendMessage($user_id,"qr ".$text);
+                        //$dir=('tmp/');
+                        $open=fopen(sys_get_temp_dir(),"w+"); //на всякий случай открываем тмп папку для чтения и записи
+                        $write=fwrite($open,$url); //
+                        $tmp = tempnam(sys_get_temp_dir(), 'img'); //первый способ добавления файла
+                        //$botApi->getFile($file); //второй способ
+                        //$botApi->downloadFile($file); //добавления файла
+                        //$bot->sendMessage($user_id, "file ".$fileId);
+                        //$content = file_get_contents($url); //третий способ
+                        //tempnam(file_put_contents(sys_get_temp_dir().$url,$content),'mpx');//добавления файла
+                        //$bot->sendMessage($user_id, "url ".$url);
+                       // $parse->parse($url);
+                        //$bot->sendMessage($user_id, "parse ".$parse[text]);
+                       /* $qrcode = new QrReader($a1);
+                        $text = $qrcode->text();       //  рабочая обработка qr-кода
+                        $bot->sendMessage($user_id,"qr ".$text);*/
                         try {
                             $bot->sendMessage($user_id, "tmp ".$tmp);
                             (new HttpClient())->request('GET', $url, ['sink' => $tmp]);
