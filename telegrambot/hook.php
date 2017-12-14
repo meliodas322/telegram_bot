@@ -85,7 +85,7 @@ switch ($dbid->getState($user_id)[0]["state"]) { // в переменной $mes
                             $bot->sendMessage($user_id, "catch ".$result);
                         } finally {
                             $dbid->queryUpdate($chat_id,4);
-                            unlink($tmp);
+                            unlink($tmp); //после всех действий удаляем файл
                         }
                         if (isset($result) && $ans->isValidBarcodeScanResult($result)) {
                             $bot->sendMessage($user_id, "расшифровка прошла");
