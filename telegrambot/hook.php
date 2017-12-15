@@ -6,12 +6,14 @@ require "dataBase.php";
 require "dataBaseId.php";
 use GuzzleHttp\Client as HttpClient;
 use RobbieP\ZbarQrdecoder\ZbarDecoder;
+use RobbieP\ZbarQrdecoder\Result\Parser\ParserXML;
 $ZbarDecoder = new RobbieP\ZbarQrdecoder\ZbarDecoder();
+$parse = new \RobbieP\ZbarQrdecoder\Result\Parser\ParserXML();
 $dbid = new dataBaseId(); //переменнтая для получения позиции и object_id
 $bot = new BOT(); // в переменную $bot создаем экземпляр нашего класса BOT
 $ans = new Answers();
 $db = new dataBase();
-$token = 'ТОКЕН';
+$token = '430953708:AAE7LvJ-uCGU9IxEecUaJxkQqjs3DOGWblQ';
 $botApi = new \TelegramBot\Api\BotApi($token);
 ############################################################################
 $output         = json_decode(file_get_contents('php://input'), true);  // Получим то, что передано скрипту ботом в POST-сообщении и распарсим
@@ -62,14 +64,14 @@ switch ($dbid->getState($user_id)[0]["state"]) { // в переменной $mes
                         $a2 = $a.$b1;
                         $url = $a1;
                         //$dir=('tmp/');
-                        $open=fopen(sys_get_temp_dir(),"w+"); //на всякий случай открываем тмп папку для чтения и записи
-                        $write=fwrite($open,$url); //
-                        $tmp = tempnam(sys_get_temp_dir(), 'img'); //первый способ добавления файла
-                        //$botApi->getFile($file); //второй способ
-                        //$botApi->downloadFile($file); //добавления файла
+                        $open=fopen(sys_get_temp_dir(),"w+");
+                        $write=fwrite($open,$url);
+                        $tmp = tempnam(sys_get_temp_dir(), 'img');
+                        //$botApi->getFile($file);
+                        //$botApi->downloadFile($file);
                         //$bot->sendMessage($user_id, "file ".$fileId);
-                        //$content = file_get_contents($url); //третий способ
-                        //tempnam(file_put_contents(sys_get_temp_dir().$url,$content),'mpx');//добавления файла
+                        //$content = file_get_contents($url);
+                        //tempnam(file_put_contents(sys_get_temp_dir().$url,$content),'mpx');
                         //$bot->sendMessage($user_id, "url ".$url);
                        // $parse->parse($url);
                         //$bot->sendMessage($user_id, "parse ".$parse[text]);
@@ -77,20 +79,21 @@ switch ($dbid->getState($user_id)[0]["state"]) { // в переменной $mes
                         $text = $qrcode->text();       //  рабочая обработка qr-кода
                         $bot->sendMessage($user_id,"qr ".$text);*/
                         try {
-                            $bot->sendMessage($user_id, "tmp ".$tmp);
                             (new HttpClient())->request('GET', $url, ['sink' => $tmp]);
-                            $result = $ans->getContainer()->make(ZbarDecoder::class)->make($tmp);
+                            //$bot->sendMessage($user_id, "tmp ".$tmp);
+                            $result = $ZbarDecoder->make('/tmp/codejpg.jpg');
                         } catch (Exception $e){
                             $bot->sendMessage($user_id, "catch ".$e->getMessage());
-                            $bot->sendMessage($user_id, "catch ".$result);
+                            //$bot->sendMessage($user_id, "catch ".$result);
                         } finally {
+                            $bot->sendMessage($user_id, "resalt ".$result);
                             $dbid->queryUpdate($chat_id,4);
-                            unlink($tmp); //после всех действий удаляем файл
+                            unlink($tmp);
                         }
                         if (isset($result) && $ans->isValidBarcodeScanResult($result)) {
                             $bot->sendMessage($user_id, "расшифровка прошла");
                             $bot->sendMessage($user_id, "результат ".$resalt);
-                        }*/
+                        }
         } else {
             $mass = $db->call($message);
             $c = count(($mass));
@@ -107,7 +110,7 @@ switch ($dbid->getState($user_id)[0]["state"]) { // в переменной $mes
                 } else {
                 $bot->sendMessage($chat_id, "Пользователя с таким номером карты не обнаружено");
                 $bot->sendMessage($user_id,"Меню",[['Оформить заказ']]);
-                $dbid->queryUpdate($chat_id,1);
+                $dbid->queryUpdate($chat_id,2);
                 };
         }
         break;
@@ -123,6 +126,8 @@ switch ($dbid->getState($user_id)[0]["state"]) { // в переменной $mes
                         $dbid->queryUpdatePhone($chat_id,$mass[$key]["phone_number"]);
                         $dbid->queryUpdateCardType($chat_id,$mass[$key]["card_type"]);
                         $dbid->queryUpdateEmail($chat_id,$mass[$key]["email"]);
+                        $object_id=$dbid->getObjectId($chat_id);
+                        $dbid->executeOrderNumber($object_id[0]["object_id"]);
                         $dbid->queryUpdate($chat_id,5);
                     }
                 }
@@ -136,6 +141,8 @@ switch ($dbid->getState($user_id)[0]["state"]) { // в переменной $mes
                         $dbid->queryUpdatePhone($chat_id,$mass[$key]["phone_number"]);
                         $dbid->queryUpdateCardType($chat_id,$mass[$key]["card_type"]);
                         $dbid->queryUpdateEmail($chat_id,$mass[$key]["email"]);
+                        $object_id=$dbid->getObjectId($chat_id);
+                        $dbid->executeOrderNumber($object_id[0]["object_id"]);
                         $dbid->queryUpdate($chat_id,5);
                     }
                 }
@@ -143,30 +150,53 @@ switch ($dbid->getState($user_id)[0]["state"]) { // в переменной $mes
             break;
         case '5':
             $dbid->queryUpdateProductName($chat_id,$message);
+            $id = $dbid->getId();
+            //$object_id=$dbid->getObjectId($chat_id);
+            $dbid->executeTelegramId($chat_id,$id[count(($id))-1]["id"]);
+            $dbid->executeProductName($message,$id[count(($id))-1]["id"]);
             $ans->sendProductCost(4, $bot, $chat_id);
             $dbid->queryUpdate($chat_id,6);
             break;
         case '6':
             $dbid->queryUpdateProductCost($chat_id,$message);
-            $bot->sendMessage($user_id,"Выберите способ регистрации",[['Начислить баллы','Начислить комплименты'],['Начислить баллы и комплименты','Ничего не начислять']]);
+            $id = $dbid->getId();
+            $dbid->executeProductCost($message,$id[count(($id))-1]["id"]);
+            $bot->sendMessage($user_id,"Продолжить оформление заказа или добавить новый товар?",[['Продолжить оформление'],['Добавить товар']]);
             $dbid->queryUpdate($chat_id,7);
             break;
         case '7':
+            if($message=='Продолжить оформление'){
+            $bot->sendMessage($user_id,"Выберите способ регистрации",[['Начислить баллы','Начислить комплименты'],['Начислить баллы и комплименты','Ничего не начислять']]);
+            $dbid->queryUpdate($chat_id,8);
+            } elseif($message=='Добавить товар'){
+                $object_id=$dbid->getObjectId($chat_id);
+                $dbid->executeOrderNumber($object_id[0]["object_id"]);
+                $ans->sendProductName(3, $bot, $chat_id);
+                $dbid->queryUpdate($chat_id,5);
+            }
+            break;
+        case '8':
+            $productCost=$dbid->getProductCostRes($chat_id);
+            $summ = 0;
+            foreach($productCost as $v){
+                $summ += $v[product_cost];
+                $mum.=$v[product_name].' ';
+            }
             $dbid->queryUpdateRewardType($chat_id,$message);
             $text ="В заказе вы указали следующие данные:
             номер карты - ".$dbid->getCardNumber($chat_id)[0]['card_number']."
             тип карты - ".$dbid->getCardType($chat_id)[0]['card_type']."
             email - ".$dbid->getEmail($chat_id)[0]['email']."
-            название товара - ".$dbid->getProductName($chat_id)[0]['product_name']."
-            цена товара - ".$dbid->getProductCost($chat_id)[0]['product_cost']."
+            название товара - ".$mum."
+            общая сумма - ".$summ."
             тип регистрации - ".$dbid->getRewardType($chat_id)[0]['reward_type']."
             Если хотите оформить заказ на эти данные нажмите Да.
             Если хотите вернуться к началу нажмите Нет";
             $bot->sendMessage($user_id,$text);
             $bot->sendMessage($user_id,"Подтвердить заказ?",[['Да'],['Нет']]);
-            $dbid->queryUpdate($chat_id,8);
+            $dbid->queryUpdate($chat_id,9);
             break;
-        case '8':
+        case '9':
             if($message == 'Да'){
                 $dbinfo = array(
                     'object_id'=> $dbid->queryCard($chat_id)[0]['object_id'],
@@ -177,8 +207,16 @@ switch ($dbid->getState($user_id)[0]["state"]) { // в переменной $mes
                     'product_name'=>$dbid->getProductName($chat_id)[0]['product_name'],
                     'reward_type'=>$dbid->getRewardType($chat_id)[0]['reward_type']
                 );
-                $result = $db->call2($dbinfo["object_id"],$dbinfo["email"], $dbinfo["product_name"], $dbinfo["product_cost"], $dbinfo["reward_type"]);
-                if($result=='success')
+                $id = $dbid->getId();
+                $prodCost=$dbid->getProductCostRes($chat_id);
+                $res=null;
+                for($i=0;$i<count($id)-1;$i++){
+                $result = $db->call2($dbinfo["object_id"],$dbinfo["email"], $prodCost[$i]["product_name"], $prodCost[$i]["product_cost"], $dbinfo["reward_type"]);
+                if($result=='success'){
+                    $res=$res+1;
+                }
+                }
+                if($res==count($id)-1)
                 {
                     $bot->sendMessage($user_id,"Заказ успешно зарегистрирован");
                     $bot->sendMessage($user_id,"Меню",[['Оформить заказ']]);
