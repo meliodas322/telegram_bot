@@ -21,7 +21,77 @@ class dataBaseId
         $sth = $this->link->prepare($sql);
         return $sth->execute();
     }
-
+    public  function getObjectId($id){
+        $sth = $this->link->prepare("SELECT `object_id` FROM `data_id` where `telegram_id`=".$id." ");
+        $sth->execute();
+        $result = $sth->fetchAll(PDO::FETCH_ASSOC);
+        if ($result === false) {
+            return [];
+        }
+        return $result;
+    }
+    public function getProductCostRes($id){
+        $sth = $this->link->prepare("SELECT * FROM `orders` where `telegram_id`=".$id." ");
+        $sth->execute();
+        $result = $sth->fetchAll(PDO::FETCH_ASSOC);
+        if ($result === false) {
+            return [];
+        }
+        return $result;
+    }
+    public function getProductNameRes($id){
+        $sth = $this->link->prepare("SELECT `product_name` FROM `orders` where `telegram_id`=".$id."");
+        $sth->execute();
+        $result = $sth->fetchAll(PDO::FETCH_ASSOC);
+        if ($result === false) {
+            return [];
+        }
+        return $result;
+    }
+    public  function getId(){
+        $sth = $this->link->prepare("SELECT `id` FROM `orders`");
+        $sth->execute();
+        $result = $sth->fetchAll(PDO::FETCH_ASSOC);
+        if ($result === false) {
+            return [];
+        }
+        return $result;
+    }
+    public function executeOrderNumber($order_number)
+    {
+        $sth = $this->link->prepare("INSERT INTO `orders` SET `order_number`=".$order_number." ");
+        return $sth->execute();
+    }
+    public function executeTelegramId($telegram_id,$id)
+    {
+        $sth = $this->link->prepare("UPDATE orders SET telegram_id=".$telegram_id." where id=".$id."");
+        $sth->execute();
+        $result = $sth->fetchAll(PDO::FETCH_ASSOC);
+        if ($result === false) {
+            return [];
+        }
+        return $result;
+    }
+    public function executeProductCost($product_cost,$id)
+    {
+        $sth = $this->link->prepare("UPDATE orders SET product_cost=".$product_cost." where id=".$id."");
+        $sth->execute();
+        $result = $sth->fetchAll(PDO::FETCH_ASSOC);
+        if ($result === false) {
+            return [];
+        }
+        return $result;
+    }
+    public function executeProductName($product_name,$id)
+    {
+        $sth = $this->link->prepare("UPDATE orders SET product_name='$product_name' where id=".$id."");
+        $sth->execute();
+        $result = $sth->fetchAll(PDO::FETCH_ASSOC);
+        if ($result === false) {
+            return [];
+        }
+        return $result;
+    }
     public function query($sql)
     {
         $sth = $this->link->prepare($sql);
