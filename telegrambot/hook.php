@@ -127,7 +127,7 @@ switch ($dbid->getState($user_id)[0]["state"]) { // в переменной $mes
                         $dbid->queryUpdateCardType($chat_id,$mass[$key]["card_type"]);
                         $dbid->queryUpdateEmail($chat_id,$mass[$key]["email"]);
                         $object_id=$dbid->getObjectId($chat_id);
-                        $dbid->executeOrderNumber($object_id[0]["object_id"]);
+                        $dbid->executeOrderNumber($object_id[0]["object_id"]);//задаем новую позицию в корзину
                         $dbid->queryUpdate($chat_id,5);
                     }
                 }
@@ -142,7 +142,7 @@ switch ($dbid->getState($user_id)[0]["state"]) { // в переменной $mes
                         $dbid->queryUpdateCardType($chat_id,$mass[$key]["card_type"]);
                         $dbid->queryUpdateEmail($chat_id,$mass[$key]["email"]);
                         $object_id=$dbid->getObjectId($chat_id);
-                        $dbid->executeOrderNumber($object_id[0]["object_id"]);
+                        $dbid->executeOrderNumber($object_id[0]["object_id"]);//задаем новую позицию в корзину
                         $dbid->queryUpdate($chat_id,5);
                     }
                 }
@@ -151,10 +151,9 @@ switch ($dbid->getState($user_id)[0]["state"]) { // в переменной $mes
         case '5':
             $dbid->queryUpdateProductName($chat_id,$message);
             $id = $dbid->getId();
-            //$object_id=$dbid->getObjectId($chat_id);
-            $dbid->executeTelegramId($chat_id,$id[count(($id))-1]["id"]);
-            $dbid->executeProductName($message,$id[count(($id))-1]["id"]);
-            $ans->sendProductCost(4, $bot, $chat_id);
+            $dbid->executeTelegramId($chat_id,$id[count(($id))-1]["id"]); //записываем значения
+            $dbid->executeProductName($message,$id[count(($id))-1]["id"]); //телеграм id, названия
+            $ans->sendProductCost(4, $bot, $chat_id);//товара и цену в базу корзины
             $dbid->queryUpdate($chat_id,6);
             break;
         case '6':
@@ -187,7 +186,7 @@ switch ($dbid->getState($user_id)[0]["state"]) { // в переменной $mes
             номер карты - ".$dbid->getCardNumber($chat_id)[0]['card_number']."
             тип карты - ".$dbid->getCardType($chat_id)[0]['card_type']."
             email - ".$dbid->getEmail($chat_id)[0]['email']."
-            название товара - ".$mum."
+            названия товаров - ".$mum."
             общая сумма - ".$summ."
             тип регистрации - ".$dbid->getRewardType($chat_id)[0]['reward_type']."
             Если хотите оформить заказ на эти данные нажмите Да.
