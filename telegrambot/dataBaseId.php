@@ -21,6 +21,7 @@ class dataBaseId
         $sth = $this->link->prepare($sql);
         return $sth->execute();
     }
+    //получаем id объекта
     public  function getObjectId($id){
         $sth = $this->link->prepare("SELECT `object_id` FROM `data_id` where `telegram_id`=".$id." ");
         $sth->execute();
@@ -30,6 +31,7 @@ class dataBaseId
         }
         return $result;
     }
+    //получаем финальный массив с значениями товаров в корзине
     public function getProductCostRes($id){
         $sth = $this->link->prepare("SELECT * FROM `orders` where `telegram_id`=".$id." ");
         $sth->execute();
@@ -39,15 +41,7 @@ class dataBaseId
         }
         return $result;
     }
-    public function getProductNameRes($id){
-        $sth = $this->link->prepare("SELECT `product_name` FROM `orders` where `telegram_id`=".$id."");
-        $sth->execute();
-        $result = $sth->fetchAll(PDO::FETCH_ASSOC);
-        if ($result === false) {
-            return [];
-        }
-        return $result;
-    }
+    //получаем все id из базы корзины
     public  function getId(){
         $sth = $this->link->prepare("SELECT `id` FROM `orders`");
         $sth->execute();
@@ -57,11 +51,13 @@ class dataBaseId
         }
         return $result;
     }
+    //устанавливаем номер заказа для корзины
     public function executeOrderNumber($order_number)
     {
         $sth = $this->link->prepare("INSERT INTO `orders` SET `order_number`=".$order_number." ");
         return $sth->execute();
     }
+    //устанавливаем телеграм id для позиции в корзине
     public function executeTelegramId($telegram_id,$id)
     {
         $sth = $this->link->prepare("UPDATE orders SET telegram_id=".$telegram_id." where id=".$id."");
@@ -72,6 +68,7 @@ class dataBaseId
         }
         return $result;
     }
+    //утанавливаем цену для позиции в корзине
     public function executeProductCost($product_cost,$id)
     {
         $sth = $this->link->prepare("UPDATE orders SET product_cost=".$product_cost." where id=".$id."");
@@ -82,6 +79,7 @@ class dataBaseId
         }
         return $result;
     }
+    //устанавливаем название товара для позиции в корзине
     public function executeProductName($product_name,$id)
     {
         $sth = $this->link->prepare("UPDATE orders SET product_name='$product_name' where id=".$id."");
@@ -111,6 +109,7 @@ class dataBaseId
         }
         return $result;
     }
+    //обновляем шаг для основного скрипта
     public  function queryUpdate($id,$state){
 
         $sth = $this->link->prepare("UPDATE data_id SET state=".$state." where telegram_id=".$id."");
@@ -121,6 +120,7 @@ class dataBaseId
         }
         return $result;
     }
+    //получаем шаг на котором сейчас находимся
     public  function getState($id){
         $sth = $this->link->prepare("SELECT `state` FROM `data_id` where `telegram_id`=".$id."");
         $sth->execute();
@@ -130,8 +130,8 @@ class dataBaseId
         }
         return $result;
     }
+    //обновляем емаил 
     public  function queryUpdateEmail($id,$email){
-
         $sth = $this->link->prepare("UPDATE data_id SET email='$email'where telegram_id=".$id."");
         $sth->execute();
         $result = $sth->fetchAll(PDO::FETCH_ASSOC);
@@ -140,6 +140,7 @@ class dataBaseId
         }
         return $result;
     }
+    //получаем емаил
     public  function getEmail($id){
         $sth = $this->link->prepare("SELECT `email` FROM `data_id` where `telegram_id`=".$id."");
         $sth->execute();
@@ -149,6 +150,7 @@ class dataBaseId
         }
         return $result;
     }
+    //обновляем значение типа карты
     public  function queryUpdateCardType($id,$card_type){
 
         $sth = $this->link->prepare("UPDATE data_id SET card_type='$card_type' where telegram_id=".$id."");
@@ -159,6 +161,7 @@ class dataBaseId
         }
         return $result;
     }
+    //получаем тип карты записаный в базе
     public  function getCardType($id){
     $sth = $this->link->prepare("SELECT `card_type` FROM `data_id` where `telegram_id`=".$id."");
     $sth->execute();
@@ -168,6 +171,7 @@ class dataBaseId
     }
     return $result;
     }
+    //обновляем цену товара
     public  function queryUpdateProductCost($id,$product_cost){
 
         $sth = $this->link->prepare("UPDATE data_id SET product_cost=".$product_cost." where telegram_id=".$id."");
@@ -178,6 +182,7 @@ class dataBaseId
         }
         return $result;
     }
+    //получаем цену товара
     public  function getProductCost($id){
         $sth = $this->link->prepare("SELECT `product_cost` FROM `data_id` where `telegram_id`=".$id."");
         $sth->execute();
