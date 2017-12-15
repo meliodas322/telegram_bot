@@ -17,7 +17,6 @@ $token = '430953708:AAE7LvJ-uCGU9IxEecUaJxkQqjs3DOGWblQ';
 $botApi = new \TelegramBot\Api\BotApi($token);
 ############################################################################
 $output         = json_decode(file_get_contents('php://input'), true);  // Получим то, что передано скрипту ботом в POST-сообщении и распарсим
-
 $chat_id        = @$output['message']['chat']['id'];                    // идентификатор чата
 $user_id        = @$output['message']['from']['id'];                    // идентификатор пользователя
 $username       = @$output['message']['from']['username'];              // username пользователя
@@ -27,10 +26,8 @@ $chat_time      = @$output['message']['date'];                          // да�
 $message        = @$output['message']['text'];                          // Выделим сообщение собеседника (регистр по умолчанию)
 $photo          = $output['message']['photo'];
 $msg            = mb_strtolower(@$output['message']['text'], "utf8");   // Выделим сообщение собеседника (нижний регистр)
-
 $callback_query = @$output["callback_query"];                           // callback запросы
 $data           = $callback_query['data'];                              // callback данные для обработки inline кнопок
-
 $message_id     = $callback_query['message']['message_id'];             // идентификатор последнего сообщения
 $chat_id_in     = $callback_query['message']['chat']['id'];             // идентификатор чата
 ############################################################################
@@ -102,7 +99,7 @@ switch ($dbid->getState($user_id)[0]["state"]) { // в переменной $mes
                 $array[$e] = array($mass[$e]["card_type"]);
                             # добавить телефоны
                 }
-            if ($message == $mass[0]["card_number"]) {
+            if ($message == $mass[0]["card_number"] && $array[0]!=null) {
                 $dbid->queryUpdateCardNumber($chat_id,$message);
                 $keyboardr = new \TelegramBot\Api\Types\ReplyKeyboardMarkup($array, true);
                 $botApi->sendMessage($chat_id, "Доступные карты", null, false, null, $keyboardr);
