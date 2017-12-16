@@ -95,10 +95,17 @@ switch ($dbid->getState($user_id)[0]["state"]) { // в переменной $mes
             $mass = $db->call($message);
             $c = count(($mass));
             $array = array();
-            for ($e = 0; $e < $c-1; $e++) {
+            if ($c == 1){
+                for ($e = 0; $e < 1; $e++) {
                 $array[$e] = array($mass[$e]["card_type"]);
                             # добавить телефоны
                 }
+            } elseif($c>1){
+                for ($e = 0; $e < $c-1; $e++) {
+                $array[$e] = array($mass[$e]["card_type"]);
+                            # добавить телефоны
+                }
+            }
             if ($message == $mass[0]["card_number"] && $array[0]!=null) {
                 $dbid->queryUpdateCardNumber($chat_id,$message);
                 $keyboardr = new \TelegramBot\Api\Types\ReplyKeyboardMarkup($array, true);
@@ -117,7 +124,9 @@ switch ($dbid->getState($user_id)[0]["state"]) { // в переменной $mes
                 $card = $dbid->getCardNumber($chat_id);
                 $mass = $db->call($card[0]['card_number']);
                 $c = count(($mass));
-                for ($key = 0; $key < count($mass)-1; $key++) {
+                if ($c == 1)
+                {
+                    $key = 0;
                     if ($message == $mass[$key]["card_type"]) {
                         $ans->sendProductName(3, $bot, $chat_id);
                         $dbid->queryUpdatePhone($chat_id,$mass[$key]["phone_number"]);
@@ -126,6 +135,18 @@ switch ($dbid->getState($user_id)[0]["state"]) { // в переменной $mes
                         $object_id=$dbid->getObjectId($chat_id);
                         $dbid->executeOrderNumber($object_id[0]["object_id"]);//задаем новую позицию в корзину
                         $dbid->queryUpdate($chat_id,5);
+                    }
+                } elseif($c>1){
+                    for ($key = 0; $key < count($mass)-1; $key++) {
+                    if ($message == $mass[$key]["card_type"]) {
+                        $ans->sendProductName(3, $bot, $chat_id);
+                        $dbid->queryUpdatePhone($chat_id,$mass[$key]["phone_number"]);
+                        $dbid->queryUpdateCardType($chat_id,$mass[$key]["card_type"]);
+                        $dbid->queryUpdateEmail($chat_id,$mass[$key]["email"]);
+                        $object_id=$dbid->getObjectId($chat_id);
+                        $dbid->executeOrderNumber($object_id[0]["object_id"]);//задаем новую позицию в корзину
+                        $dbid->queryUpdate($chat_id,5);
+                        }
                     }
                 }
             }elseif($message=='Евроопт'){
