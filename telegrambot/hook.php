@@ -226,6 +226,7 @@ switch ($dbid->getState($user_id)[0]["state"]) { // в переменной $mes
                 $bot->sendMessage($user_id,"Меню",[['Оформить заказ']]);
                 $dbid->queryUpdate($chat_id, 2);
             }
+            $dbid->deleteOrders($chat_id);
             break;
     default: $bot->sendMessage($user_id, "Неизвестная команда");
 }
