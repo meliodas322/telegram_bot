@@ -268,4 +268,10 @@ class dataBaseId
         }
         return $result;
     }
+    //удаление записаных товаров из базы
+    public function deleteOrders($id)
+    {
+        $sth = $this->link->prepare("DELETE FROM orders WHERE telegram_id=".$id." ");
+        return $sth->execute();
+    }
 }
