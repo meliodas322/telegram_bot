@@ -232,13 +232,13 @@ switch ($dbid->getState($user_id)[0]["state"]) { // в переменной $mes
                 $id = $dbid->getId();
                 $prodCost=$dbid->getProductCostRes($chat_id);
                 $res=null;
-                for($i=0;$i<count($id)-1;$i++){
+                for($i=0;$i<=count($id)-1;$i++){
                 $result = $db->call2($dbinfo["object_id"],$dbinfo["email"], $prodCost[$i]["product_name"], $prodCost[$i]["product_cost"], $dbinfo["reward_type"]);
                 if($result=='success'){
                     $res=$res+1;
                 }
                 }
-                if($res==count($id)-1)
+                if($res==count($id))
                 {
                     $bot->sendMessage($user_id,"Заказ успешно зарегистрирован");
                     $bot->sendMessage($user_id,"Меню",[['Оформить заказ']]);
